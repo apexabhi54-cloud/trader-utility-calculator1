@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trader Utility · All Calculators</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: #0b0f1a;
+            color: #eaeef5;
+            min-height: 100vh;
+            padding-bottom: 40px;
+            position: relative;
+            overflow-x: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* light mode */
+        body.light {
+            background: #f0f4fc;
+            color: #0b1a2e;
+        }
+        body.light .header { background: rgba(240, 244, 252, 0.7); border-bottom-color: rgba(0,0,0,0.05); }
+        body.light .search-box { background: rgba(255,255,255,0.6); color: #0b1a2e; border-color: #ccc; }
+        body.light .filter-btn { background: rgba(0,0,0,0.03); color: #1f3a60; border-color: #d0d8e8; }
+        body.light .filter-btn.active { background: #2a5c9e; color: white; border-color: #5a8cff; }
+        body.light .calc-card { background: rgba(255,255,255,0.5); border-color: rgba(0,0,0,0.06); }
+        body.light .calc-card:hover { background: rgba(255,255,255,0.8); }
+        body.light .calc-card .icon { color: #1a5bc7; }
+        body.light .workspace-card { background: rgba(240, 244, 252, 0.9); border-color: #ccc; }
+        body.light .input-group input, body.light .input-group select { background: rgba(255,255,255,0.7); color: #0b1a2e; border-color: #bbb; }
+        body.light .result-box { background: rgba(0,0,0,0.04); border-left-color: #1a5bc7; color: #0b1a2e; }
+        body.light .workspace-card .back { color: #1f3a60; }
+        body.light .workspace-card .desc { color: #2a4050; }
+        body.light .nav a { color: #1f3a60; }
+        body.light .nav a:hover { color: #0b1a2e; }
+        body.light .footer { border-top-color: rgba(0,0,0,0.05); color: #3a5060; }
+        body.light .footer .brand { color: #0b1a2e; }
+        body.light .modal-box { background: rgba(240, 244, 252, 0.95); color: #0b1a2e; border-color: rgba(0,0,0,0.06); }
+        body.light .modal-box h2 { color: #1a5bc7; }
+        body.light .modal-box p, body.light .modal-box li { color: #1f3a60; }
+        body.light .modal-box .highlight { color: #1a5bc7; }
+        body.light .modal-box .contact-row i { color: #1a5bc7; }
+        body.light .modal-box .close-modal { color: #3a5060; }
+        body.light .modal-box .close-modal:hover { color: #0b1a2e; }
+
+        /* ===== PREMIUM DARK BACKGROUND WITH FLOATING 1 2 3 4 / A B C D ===== */
+        .bg-animation {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            background: radial-gradient(circle at 30% 30%, #0f1f3a, #05080f 80%);
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+        body.light .bg-animation {
+            background: radial-gradient(circle at 30% 30%, #c8daf0, #dce6f5 80%);
+        }
+
+        /* floating numbers and letters */
+        .float-char {
+            position: absolute;
+            font-weight: 800;
+            font-size: 5rem;
+            opacity: 0.08;
+            color: #fff;
+            user-select: none;
+            pointer-events: none;
+            animation: floatAround 25s infinite alternate ease-in-out;
+            text-shadow: 0 0 40px rgba(255,255,255,0.03);
+        }
+        .float-char:nth-child(1) { left: 5%; top: 10%; animation-duration: 22s; font-size: 7rem; color: #ff6b6b; opacity: 0.12; }
+        .float-char:nth-child(2) { left: 18%; top: 45%; animation-duration: 26s; animation-delay: -3s; font-size: 4.5rem; color: #feca57; opacity: 0.1; }
+        .float-char:nth-child(3) { left: 35%; top: 8%; animation-duration: 24s; animation-delay: -6s; font-size: 6rem; color: #48dbfb; opacity: 0.11; }
+        .float-char:nth-child(4) { left: 55%; top: 30%; animation-duration: 28s; animation-delay: -9s; font-size: 5.5rem; color: #ff9ff3; opacity: 0.12; }
+        .float-char:nth-child(5) { left: 72%; top: 12%; animation-duration: 20s; animation-delay: -12s; font-size: 6.5rem; color: #54a0ff; opacity: 0.1; }
+        .float-char:nth-child(6) { left: 85%; top: 55%; animation-duration: 30s; animation-delay: -5s; font-size: 4.8rem; color: #5f27cd; opacity: 0.09; }
+        .float-char:nth-child(7) { left: 10%; top: 75%; animation-duration: 27s; animation-delay: -8s; font-size: 5.2rem; color: #ff6b6b; opacity: 0.1; }
+        .float-char:nth-child(8) { left: 45%; top: 70%; animation-duration: 23s; animation-delay: -14s; font-size: 6.8rem; color: #feca57; opacity: 0.11; }
+        .float-char:nth-child(9) { left: 65%; top: 80%; animation-duration: 29s; animation-delay: -2s; font-size: 4.2rem; color: #48dbfb; opacity: 0.1; }
+        .float-char:nth-child(10) { left: 92%; top: 20%; animation-duration: 21s; animation-delay: -10s; font-size: 5.8rem; color: #ff9ff3; opacity: 0.09; }
+
+        @keyframes floatAround {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            25% { transform: translate(40px, -60px) rotate(15deg) scale(1.1); }
+            50% { transform: translate(-30px, 30px) rotate(-10deg) scale(0.9); }
+            75% { transform: translate(50px, 40px) rotate(8deg) scale(1.05); }
+            100% { transform: translate(-20px, -40px) rotate(-5deg) scale(1); }
+        }
+
+        /* colorful gradient orbs behind */
+        .bg-animation .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.25;
+            animation: morphOrb 22s infinite alternate ease-in-out;
+        }
+        .orb:nth-child(11) {
+            width: 600px; height: 600px;
+            background: #ff6b6b;
+            top: -180px; left: -180px;
+            animation-duration: 26s;
+        }
+        .orb:nth-child(12) {
+            width: 500px; height: 500px;
+            background: #feca57;
+            bottom: -150px; right: -150px;
+            animation-duration: 30s;
+            animation-delay: -5s;
+        }
+        .orb:nth-child(13) {
+            width: 450px; height: 450px;
+            background: #48dbfb;
+            top: 25%; left: 55%;
+            animation-duration: 24s;
+            animation-delay: -9s;
+        }
+        .orb:nth-child(14) {
+            width: 400px; height: 400px;
+            background: #ff9ff3;
+            bottom: 15%; left: 5%;
+            animation-duration: 28s;
+            animation-delay: -13s;
+        }
+
+        @keyframes morphOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(40px, -30px) scale(1.2); }
+            100% { transform: translate(-30px, 30px) scale(0.9); }
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* header premium */
+        .header {
+            padding: 18px 0 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            backdrop-filter: blur(14px);
+            background: rgba(11, 15, 26, 0.35);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background 0.3s, border-color 0.3s, transform 0.2s ease;
+        }
+        .header.hidden-header {
+            transform: translateY(-100%);
+        }
+        .logo {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            pointer-events: none;
+            user-select: none;
+            letter-spacing: -0.5px;
+            animation: gradientShift 6s ease-in-out infinite alternate;
+        }
+        @keyframes gradientShift {
+            0% { background: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff); -webkit-background-clip: text; background-clip: text; }
+            50% { background: linear-gradient(135deg, #54a0ff, #ff9ff3, #48dbfb, #feca57, #ff6b6b); -webkit-background-clip: text; background-clip: text; }
+            100% { background: linear-gradient(135deg, #feca57, #ff6b6b, #54a0ff, #ff9ff3, #48dbfb); -webkit-background-clip: text; background-clip: text; }
+        }
+        .logo i {
+            -webkit-text-fill-color: initial;
+            color: #7ab7ff;
+            margin-right: 10px;
+            filter: drop-shadow(0 0 20px rgba(90, 150, 255, 0.3));
+        }
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            flex-wrap: wrap;
+        }
+        .nav a {
+            color: #b0c6e8;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: 0.2s;
+            cursor: pointer;
+            padding: 6px 4px;
+            border-bottom: 2px solid transparent;
+        }
+        .nav a:hover { color: white; border-bottom-color: #ff9ff3; }
+        .nav a i { margin-right: 6px; }
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: #b0c6e8;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: 0.2s;
+            padding: 4px 8px;
+        }
+        .theme-toggle:hover { color: white; transform: rotate(20deg); }
+
+        /* search & filter */
+        .search-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 28px 0 18px;
+            align-items: center;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 40px;
+            padding: 12px 22px;
+            color: white;
+            font-size: 1rem;
+            backdrop-filter: blur(4px);
+            transition: 0.2s;
+        }
+        .search-box:focus {
+            outline: none;
+            border-color: #ff9ff3;
+            box-shadow: 0 0 40px rgba(255, 150, 255, 0.08);
+        }
+        .search-box::placeholder { color: #8a9fc0; }
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .filter-btn {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: #b0c6e8;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            backdrop-filter: blur(4px);
+            font-size: 0.9rem;
+        }
+        .filter-btn:hover { background: rgba(255, 150, 255, 0.1); color: white; border-color: rgba(255, 150, 255, 0.2); }
+        .filter-btn.active {
+            background: #6c3bc7;
+            border-color: #ff9ff3;
+            color: white;
+            box-shadow: 0 0 30px rgba(255, 150, 255, 0.15);
+        }
+
+        /* calculator grid */
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 22px;
+            margin-top: 20px;
+        }
+        .calc-card {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 28px;
+            padding: 28px 18px 22px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+        .calc-card:hover {
+            transform: translateY(-8px);
+            border-color: #ff9ff3;
+            background: rgba(255,255,255,0.06);
+            box-shadow: 0 20px 50px rgba(255, 150, 255, 0.1);
+        }
+        .calc-card .icon {
+            font-size: 2.6rem;
+            margin-bottom: 12px;
+            color: #ff9ff3;
+            filter: drop-shadow(0 0 20px rgba(255, 150, 255, 0.15));
+        }
+        .calc-card h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .calc-card p {
+            font-size: 0.85rem;
+            color: #9bb0d0;
+            margin-bottom: 14px;
+        }
+        .calc-card .open-tag {
+            font-size: 0.75rem;
+            background: rgba(255, 150, 255, 0.08);
+            padding: 4px 16px;
+            border-radius: 30px;
+            display: inline-block;
+            color: #d0b0e8;
+            border: 1px solid rgba(255, 150, 255, 0.08);
+            transition: 0.2s;
+        }
+        .calc-card:hover .open-tag {
+            background: #6c3bc7;
+            color: white;
+            border-color: #ff9ff3;
+        }
+
+        /* workspace modal */
+        .workspace {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(8, 12, 24, 0.92);
+            backdrop-filter: blur(24px);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        .workspace.open { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
+
+        .workspace-card {
+            max-width: 640px;
+            width: 100%;
+            background: rgba(18, 26, 48, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 40px;
+            padding: 32px 30px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .workspace-card .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #9bb0d0;
+            cursor: pointer;
+            margin-bottom: 16px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .workspace-card .back:hover { color: white; }
+        .workspace-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .workspace-card h2 i { color: #ff9ff3; }
+        .workspace-card .desc {
+            color: #9bb0d0;
+            margin-bottom: 22px;
+        }
+        .input-group {
+            margin-bottom: 16px;
+        }
+        .input-group label {
+            display: block;
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+            color: #c0d4f0;
+        }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(0,0,0,0.25);
+            color: white;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #ff9ff3;
+            box-shadow: 0 0 0 3px rgba(255, 150, 255, 0.1);
+        }
+        .input-group select option { background: #1a2640; }
+        .btn-calc {
+            background: linear-gradient(135deg, #6c3bc7, #ff6b6b);
+            border: none;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 8px;
+            width: 100%;
+            box-shadow: 0 8px 30px rgba(255, 100, 100, 0.15);
+        }
+        .btn-calc:hover { transform: scale(1.02); box-shadow: 0 12px 40px rgba(255, 100, 100, 0.25); }
+        .result-box {
+            background: rgba(0,0,0,0.2);
+            border-radius: 24px;
+            padding: 18px 22px;
+            margin-top: 22px;
+            border-left: 4px solid #ff9ff3;
+            color: #d0e2ff;
+        }
+        .result-box strong { color: white; }
+
+        /* footer */
+        .footer {
+            margin-top: 50px;
+            padding: 30px 20px 10px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            text-align: center;
+            color: #8a9fc0;
+            font-size: 0.9rem;
+        }
+        .footer .brand { font-weight: 600; color: #b0c6e8; font-size: 1.1rem; }
+        .footer .contact-line { margin: 8px 0; }
+
+        /* ===== MODAL OVERLAY FOR ABOUT & CONTACT ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(14px);
+            z-index: 300;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.25s ease;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            max-width: 620px;
+            width: 100%;
+            background: rgba(18, 26, 48, 0.92);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 40px;
+            padding: 40px 36px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            max-height: 85vh;
+            overflow-y: auto;
+            color: #eaeef5;
+        }
+        .modal-box .close-modal {
+            float: right;
+            background: none;
+            border: none;
+            color: #9bb0d0;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .modal-box .close-modal:hover { color: white; transform: rotate(90deg); }
+        .modal-box h2 {
+            font-size: 2rem;
+            margin-bottom: 16px;
+            color: #ff9ff3;
+        }
+        .modal-box p, .modal-box li {
+            line-height: 1.8;
+            color: #c0d4f0;
+        }
+        .modal-box .highlight {
+            color: #feca57;
+            font-weight: 600;
+        }
+        .modal-box .contact-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 14px 0;
+            font-size: 1.1rem;
+        }
+        .modal-box .contact-row i {
+            width: 28px;
+            color: #ff9ff3;
+            font-size: 1.2rem;
+        }
+
+        /* responsive */
+        @media (max-width: 700px) {
+            .header { flex-direction: column; align-items: stretch; gap: 12px; }
+            .nav a { margin-left: 0; margin-right: 18px; font-size: 0.9rem; }
+            .calc-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .workspace-card { padding: 24px 16px; }
+            .modal-box { padding: 28px 20px; }
+        }
+        @media (max-width: 480px) {
+            .calc-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #0b0f1a; }
+        ::-webkit-scrollbar-thumb { background: #6c3bc7; border-radius: 10px; }
+        body.light ::-webkit-scrollbar-track { background: #dce6f5; }
+        body.light ::-webkit-scrollbar-thumb { background: #ff9ff3; }
+    </style>
+</head>
+<body>
+    <!-- ===== ANIMATED BACKGROUND with 1 2 3 4 / A B C D ===== -->
+    <div class="bg-animation">
+        <!-- colorful orbs -->
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <!-- floating characters -->
+        <div class="float-char">1</div>
+        <div class="float-char">2</div>
+        <div class="float-char">3</div>
+        <div class="float-char">4</div>
+        <div class="float-char">A</div>
+        <div class="float-char">B</div>
+        <div class="float-char">C</div>
+        <div class="float-char">D</div>
+        <div class="float-char">★</div>
+        <div class="float-char">$</div>
+    </div>
+
+    <!-- MODAL: About -->
+    <div class="modal-overlay" id="aboutModal">
+        <div class="modal-box">
+            <button class="close-modal" id="closeAbout"><i class="fas fa-times"></i></button>
+            <h2><i class="fas fa-info-circle"></i> About Trader Utility</h2>
+            <p>Trader Utility Calculator is an all-in-one platform designed to make trading, investment, and financial calculations simple, fast, and accurate. Our platform provides a variety of useful tools such as Profit & Loss Calculator, Risk Reward Calculator, Position Size Calculator, SIP Calculator, Compound Interest Calculator, Brokerage Calculator, and many more.</p>
+            <br>
+            <p><span class="highlight">Our Mission</span><br>Our mission is to simplify complex financial and trading calculations and provide easy-to-use tools that help users make smarter and more informed decisions.</p>
+            <br>
+            <p><span class="highlight">Our Vision</span><br>We aim to build a reliable and user-friendly platform where traders, investors, and students can access multiple powerful calculation tools in one place.</p>
+            <br>
+            <p style="font-size:0.9rem; opacity:0.6;">Developed with ❤️ by Abhishek Kumar</p>
+        </div>
+    </div>
+
+    <!-- MODAL: Contact -->
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-box">
+            <button class="close-modal" id="closeContact"><i class="fas fa-times"></i></button>
+            <h2><i class="fas fa-envelope"></i> Contact Us</h2>
+            <p>We’d love to hear from you! If you have any questions, suggestions, feedback, or need assistance with Trader Utility Calculator, feel free to get in touch with us.</p>
+            <br>
+            <div class="contact-row"><i class="fas fa-user-circle"></i> <span><strong>Developer:</strong> Abhishek Kumar</span></div>
+            <div class="contact-row"><i class="fas fa-phone-alt"></i> <span><strong>Phone:</strong> +91 9006744604</span></div>
+            <div class="contact-row"><i class="fas fa-envelope"></i> <span><strong>Email:</strong> apexabhi54@gmail.com</span></div>
+            <br>
+            <p style="font-size:0.9rem; opacity:0.5;">We’ll get back to you as soon as possible.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <header class="header" id="mainHeader">
+            <div class="logo"><i class="fas fa-chart-line"></i> Trader Utility</div>
+            <div class="nav">
+                <a id="homeLink"><i class="fas fa-home"></i> Home</a>
+                <a id="aboutLink"><i class="fas fa-info-circle"></i> About</a>
+                <a id="contactLink"><i class="fas fa-envelope"></i> Contact</a>
+                <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+            </div>
+        </header>
+
+        <!-- search & filters -->
+        <div class="search-section">
+            <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search calculators...">
+            <div class="filter-group">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="trading">Trading</button>
+                <button class="filter-btn" data-filter="finance">Finance</button>
+                <button class="filter-btn" data-filter="investment">Investment</button>
+                <button class="filter-btn" data-filter="utility">Utility</button>
+            </div>
+        </div>
+
+        <!-- grid -->
+        <div class="calc-grid" id="calcGrid"></div>
+
+        <!-- footer -->
+        <div class="footer">
+            <div class="brand">Trader Utility Calculator</div>
+            <div class="contact-line">Developer: Abhishek Kumar &nbsp;|&nbsp; Phone: +91 9006744604 &nbsp;|&nbsp; Email: apexabhi54@gmail.com</div>
+            <div style="margin-top: 10px; font-size:0.8rem; opacity:0.6;">© 2026 Trader Utility Calculator. All rights reserved.</div>
+        </div>
+    </div>
+
+    <!-- workspace modal -->
+    <div class="workspace" id="workspace">
+        <div class="workspace-card" id="workspaceCard">
+            <div class="back" id="closeWorkspace"><i class="fas fa-arrow-left"></i> Back</div>
+            <div id="workspaceBody"></div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- CALCULATOR DEFINITIONS ----------
+            const CALCULATORS = [
+                { id: 'profit-loss', name: 'Profit & Loss', icon: 'fa-arrow-trend-up', cat: 'trading', desc: 'Buy/Sell P&L with quantity' },
+                { id: 'percentage', name: 'Percentage', icon: 'fa-percent', cat: 'utility', desc: 'X% of Y, change, find %' },
+                { id: 'gst', name: 'GST Calculator', icon: 'fa-receipt', cat: 'finance', desc: 'Add or remove GST' },
+                { id: 'discount', name: 'Discount', icon: 'fa-tags', cat: 'utility', desc: 'Discount amount & final price' },
+                { id: 'brokerage', name: 'Brokerage', icon: 'fa-hand-holding-usd', cat: 'trading', desc: 'Brokerage & net P&L' },
+                { id: 'riskreward', name: 'Risk Reward', icon: 'fa-scale-balanced', cat: 'trading', desc: 'Risk/Reward ratio' },
+                { id: 'positionsize', name: 'Position Size', icon: 'fa-weight-scale', cat: 'trading', desc: 'Shares based on risk' },
+                { id: 'avgprice', name: 'Average Price', icon: 'fa-calculator', cat: 'trading', desc: 'Average buy price' },
+                { id: 'stoploss', name: 'Stop Loss', icon: 'fa-ban', cat: 'trading', desc: 'Stop loss from entry & risk' },
+                { id: 'targetprice', name: 'Target Price', icon: 'fa-bullseye', cat: 'trading', desc: 'Target from entry & %' },
+                { id: 'margin', name: 'Margin', icon: 'fa-percent', cat: 'finance', desc: 'Margin percentage' },
+                { id: 'roi', name: 'ROI', icon: 'fa-arrow-up-right-dots', cat: 'investment', desc: 'Return on investment' },
+                { id: 'compound', name: 'Compound Interest', icon: 'fa-chart-simple', cat: 'investment', desc: 'Compounding growth' },
+                { id: 'breakeven', name: 'Break Even', icon: 'fa-equals', cat: 'trading', desc: 'Breakeven units' },
+                { id: 'tax', name: 'Tax Calculator', icon: 'fa-file-invoice-dollar', cat: 'finance', desc: 'Tax amount & net' },
+                { id: 'sip', name: 'SIP Calculator', icon: 'fa-coins', cat: 'investment', desc: 'Systematic investment' },
+                { id: 'lumpsum', name: 'Lumpsum', icon: 'fa-money-bill-trend-up', cat: 'investment', desc: 'Lump sum growth' },
+                { id: 'cagr', name: 'CAGR', icon: 'fa-chart-line', cat: 'investment', desc: 'Compounded annual growth' },
+                { id: 'emi', name: 'EMI Calculator', icon: 'fa-credit-card', cat: 'finance', desc: 'Loan EMI & total' },
+                { id: 'inflation', name: 'Inflation', icon: 'fa-arrow-trend-down', cat: 'finance', desc: 'Future value with inflation' },
+                { id: 'age', name: 'Age Calculator', icon: 'fa-cake-candles', cat: 'utility', desc: 'Exact age in years, months, days' }
+            ];
+
+            // ---------- HELPERS ----------
+            function calculate(id, inputs) {
+                const get = (key) => parseFloat(inputs[key]) || 0;
+                switch(id) {
+                    case 'profit-loss': {
+                        const buy=get('buy'), sell=get('sell'), qty=get('qty');
+                        const invest=buy*qty, pnl=(sell-buy)*qty, pct=(pnl/invest)*100;
+                        return { Investment: invest, 'P&L': pnl, 'P&L %': pct };
+                    }
+                    case 'percentage': {
+                        const x=get('x'), y=get('y'), type=inputs['pctType'] || 'of';
+                        if (type==='of') return { Result: (x/100)*y };
+                        if (type==='change') return { 'Change %': ((x-y)/y)*100 };
+                        if (type==='find') return { 'Percent': (x/y)*100 };
+                        return {};
+                    }
+                    case 'gst': {
+                        const amt=get('amt'), gst=get('gst');
+                        return { 'GST Amount': amt*(gst/100), 'Final Amount': amt*(1+gst/100) };
+                    }
+                    case 'discount': {
+                        const p=get('price'), d=get('disc');
+                        return { 'Discount': p*(d/100), 'Final Price': p*(1-d/100) };
+                    }
+                    case 'brokerage': {
+                        const buy=get('buy'), sell=get('sell'), qty=get('qty'), bro=get('broker');
+                        const buyVal=buy*qty, sellVal=sell*qty, brokerage=(buyVal+sellVal)*(bro/100);
+                        return { 'Buy Value': buyVal, 'Sell Value': sellVal, 'Brokerage': brokerage, 'Net P&L': sellVal-buyVal-brokerage };
+                    }
+                    case 'riskreward': {
+                        const entry=get('entry'), sl=get('sl'), target=get('target');
+                        const risk=entry-sl, reward=target-entry;
+                        return { Risk: risk, Reward: reward, Ratio: reward/risk || 0 };
+                    }
+                    case 'positionsize': {
+                        const cap=get('capital'), riskPct=get('risk'), entry=get('entry'), sl=get('sl');
+                        const riskAmt=cap*(riskPct/100), riskPerShare=entry-sl;
+                        const shares=Math.floor(riskAmt/riskPerShare);
+                        return { 'Risk Amount': riskAmt, 'Position Size': riskAmt, Shares: shares };
+                    }
+                    case 'avgprice': {
+                        const p1=get('p1'), q1=get('q1'), p2=get('p2'), q2=get('q2');
+                        const total=(p1*q1)+(p2*q2), qty=q1+q2;
+                        return { 'Average Price': total/qty || 0 };
+                    }
+                    case 'stoploss': {
+                        const entry=get('entry'), risk=get('risk');
+                        return { 'Stop Loss': entry * (1 - risk/100) };
+                    }
+                    case 'targetprice': {
+                        const entry=get('entry'), target=get('target');
+                        return { 'Target Price': entry * (1 + target/100) };
+                    }
+                    case 'margin': {
+                        const cost=get('cost'), sell=get('sell');
+                        return { 'Margin %': ((sell-cost)/sell)*100 };
+                    }
+                    case 'roi': {
+                        const init=get('init'), final=get('final');
+                        return { 'ROI %': ((final-init)/init)*100 };
+                    }
+                    case 'compound': {
+                        const p=get('p'), r=get('r'), t=get('t');
+                        const amt = p * Math.pow(1 + r/100, t);
+                        return { 'Total Amount': amt, 'Interest': amt-p };
+                    }
+                    case 'breakeven': {
+                        const fixed=get('fixed'), price=get('price'), varCost=get('var');
+                        return { 'Break Even Units': fixed/(price-varCost) };
+                    }
+                    case 'tax': {
+                        const income=get('income'), tax=get('tax');
+                        return { 'Tax Amount': income*(tax/100), 'Net Income': income*(1-tax/100) };
+                    }
+                    case 'sip': {
+                        const monthly=get('monthly'), ret=get('return'), years=get('years');
+                        const months=years*12, rate=ret/100/12;
+                        const fv = monthly * ((Math.pow(1+rate, months)-1)/rate) * (1+rate);
+                        const invested = monthly*months;
+                        return { Invested: invested, Returns: fv-invested, 'Total Value': fv };
+                    }
+                    case 'lumpsum': {
+                        const inv=get('inv'), ret=get('return'), years=get('years');
+                        const fv = inv * Math.pow(1+ret/100, years);
+                        return { Invested: inv, Returns: fv-inv, Maturity: fv };
+                    }
+                    case 'cagr': {
+                        const init=get('init'), final=get('final'), years=get('years');
+                        return { 'CAGR %': (Math.pow(final/init, 1/years)-1)*100 };
+                    }
+                    case 'emi': {
+                        const loan=get('loan'), rate=get('rate')/12/100, tenure=get('tenure');
+                        const emi = loan * rate * Math.pow(1+rate, tenure) / (Math.pow(1+rate, tenure)-1);
+                        return { 'Monthly EMI': emi, 'Total Interest': emi*tenure-loan, 'Total Payment': emi*tenure };
+                    }
+                    case 'inflation': {
+                        const amt=get('amt'), infl=get('infl'), years=get('years');
+                        const future = amt * Math.pow(1+infl/100, years);
+                        return { 'Future Value': future, 'Loss in value': future-amt };
+                    }
+                    case 'age': {
+                        const birth = new Date(inputs['birth']);
+                        const today = new Date(inputs['today'] || new Date().toISOString().split('T')[0]);
+                        if (!birth.getTime() || !today.getTime()) return { error: 'Invalid date' };
+                        let y = today.getFullYear() - birth.getFullYear();
+                        let m = today.getMonth() - birth.getMonth();
+                        let d = today.getDate() - birth.getDate();
+                        if (d < 0) { m--; const prev = new Date(today.getFullYear(), today.getMonth(), 0); d += prev.getDate(); }
+                        if (m < 0) { y--; m += 12; }
+                        return { Years: y, Months: m, Days: d };
+                    }
+                    default: return { error: 'Unknown calculator' };
+                }
+            }
+
+            // ---------- RENDER GRID ----------
+            const grid = document.getElementById('calcGrid');
+            const searchBox = document.getElementById('searchBox');
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            let activeFilter = 'all';
+            let searchTerm = '';
+
+            function renderGrid() {
+                const filtered = CALCULATORS.filter(c => {
+                    const matchCat = activeFilter === 'all' || c.cat === activeFilter;
+                    const matchSearch = c.name.toLowerCase().includes(searchTerm) || c.desc.toLowerCase().includes(searchTerm);
+                    return matchCat && matchSearch;
+                });
+                grid.innerHTML = filtered.map(c => `
+                    <div class="calc-card" data-id="${c.id}">
+                        <div class="icon"><i class="fas ${c.icon}"></i></div>
+                        <h4>${c.name}</h4>
+                        <p>${c.desc}</p>
+                        <span class="open-tag"><i class="fas fa-arrow-right"></i> Open</span>
+                    </div>
+                `).join('');
+                document.querySelectorAll('.calc-card').forEach(el => {
+                    el.addEventListener('click', () => openWorkspace(el.dataset.id));
+                });
+            }
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    activeFilter = btn.dataset.filter;
+                    renderGrid();
+                });
+            });
+            searchBox.addEventListener('input', (e) => {
+                searchTerm = e.target.value.toLowerCase();
+                renderGrid();
+            });
+
+            // ---------- WORKSPACE ----------
+            const workspace = document.getElementById('workspace');
+            const workspaceBody = document.getElementById('workspaceBody');
+            const closeBtn = document.getElementById('closeWorkspace');
+
+            function openWorkspace(id) {
+                const calc = CALCULATORS.find(c => c.id === id);
+                if (!calc) return;
+                workspace.classList.add('open');
+                document.body.style.overflow = 'hidden';
+
+                let fieldsHtml = '';
+                const fieldDefs = {
+                    'profit-loss': [{key:'buy',label:'Buying Price'},{key:'sell',label:'Selling Price'},{key:'qty',label:'Quantity'}],
+                    'percentage': [{key:'x',label:'Value X'},{key:'y',label:'Value Y'},{key:'pctType',label:'Type', type:'select', options:['of','change','find']}],
+                    'gst': [{key:'amt',label:'Original Amount'},{key:'gst',label:'GST %'}],
+                    'discount': [{key:'price',label:'Original Price'},{key:'disc',label:'Discount %'}],
+                    'brokerage': [{key:'buy',label:'Buy Price'},{key:'sell',label:'Sell Price'},{key:'qty',label:'Quantity'},{key:'broker',label:'Brokerage %'}],
+                    'riskreward': [{key:'entry',label:'Entry Price'},{key:'sl',label:'Stop Loss'},{key:'target',label:'Target Price'}],
+                    'positionsize': [{key:'capital',label:'Total Capital'},{key:'risk',label:'Risk %'},{key:'entry',label:'Entry Price'},{key:'sl',label:'Stop Loss'}],
+                    'avgprice': [{key:'p1',label:'First Buy Price'},{key:'q1',label:'First Qty'},{key:'p2',label:'Second Buy Price'},{key:'q2',label:'Second Qty'}],
+                    'stoploss': [{key:'entry',label:'Entry Price'},{key:'risk',label:'Risk %'}],
+                    'targetprice': [{key:'entry',label:'Entry Price'},{key:'target',label:'Target %'}],
+                    'margin': [{key:'cost',label:'Cost Price'},{key:'sell',label:'Selling Price'}],
+                    'roi': [{key:'init',label:'Initial Investment'},{key:'final',label:'Final Value'}],
+                    'compound': [{key:'p',label:'Principal'},{key:'r',label:'Rate %'},{key:'t',label:'Time (years)'}],
+                    'breakeven': [{key:'fixed',label:'Fixed Costs'},{key:'price',label:'Price/unit'},{key:'var',label:'Variable cost/unit'}],
+                    'tax': [{key:'income',label:'Income'},{key:'tax',label:'Tax %'}],
+                    'sip': [{key:'monthly',label:'Monthly Investment'},{key:'return',label:'Expected Return %'},{key:'years',label:'Time (years)'}],
+                    'lumpsum': [{key:'inv',label:'Investment Amount'},{key:'return',label:'Expected Return %'},{key:'years',label:'Time (years)'}],
+                    'cagr': [{key:'init',label:'Initial Value'},{key:'final',label:'Final Value'},{key:'years',label:'Years'}],
+                    'emi': [{key:'loan',label:'Loan Amount'},{key:'rate',label:'Rate %'},{key:'tenure',label:'Tenure (months)'}],
+                    'inflation': [{key:'amt',label:'Current Amount'},{key:'infl',label:'Inflation %'},{key:'years',label:'Years'}],
+                    'age': [{key:'birth',label:'Birth Date', type:'date'},{key:'today',label:'Current Date', type:'date'}]
+                };
+                const defs = fieldDefs[id] || [];
+                defs.forEach(f => {
+                    if (f.type === 'select') {
+                        fieldsHtml += `<div class="input-group"><label>${f.label}</label><select id="inp_${f.key}">${f.options.map(o => `<option value="${o}">${o}</option>`).join('')}</select></div>`;
+                    } else if (f.type === 'date') {
+                        const val = f.key === 'today' ? new Date().toISOString().split('T')[0] : '';
+                        fieldsHtml += `<div class="input-group"><label>${f.label}</label><input type="date" id="inp_${f.key}" value="${val}"></div>`;
+                    } else {
+                        fieldsHtml += `<div class="input-group"><label>${f.label}</label><input type="number" step="any" id="inp_${f.key}" placeholder="${f.label}"></div>`;
+                    }
+                });
+
+                workspaceBody.innerHTML = `
+                    <h2><i class="fas ${calc.icon}"></i> ${calc.name}</h2>
+                    <div class="desc">${calc.desc}</div>
+                    ${fieldsHtml}
+                    <button class="btn-calc" id="calcActionBtn"><i class="fas fa-play"></i> Calculate</button>
+                    <div class="result-box" id="resultBox">Click Calculate to see result</div>
+                `;
+
+                document.getElementById('calcActionBtn').addEventListener('click', () => {
+                    const inputs = {};
+                    defs.forEach(f => {
+                        const el = document.getElementById(`inp_${f.key}`);
+                        if (el) inputs[f.key] = el.value;
+                    });
+                    const result = calculate(id, inputs);
+                    const box = document.getElementById('resultBox');
+                    if (result.error) { box.innerHTML = `⚠️ ${result.error}`; return; }
+                    let html = '';
+                    for (const [k,v] of Object.entries(result)) {
+                        html += `<div><strong>${k}:</strong> ${typeof v === 'number' ? v.toFixed(2) : v}</div>`;
+                    }
+                    box.innerHTML = html || 'Done.';
+                });
+            }
+
+            function closeWorkspaceFn() {
+                workspace.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+            closeBtn.addEventListener('click', closeWorkspaceFn);
+            workspace.addEventListener('click', (e) => {
+                if (e.target === workspace) closeWorkspaceFn();
+            });
+
+            // ---------- THEME TOGGLE ----------
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light');
+                const icon = themeToggle.querySelector('i');
+                icon.className = document.body.classList.contains('light') ? 'fas fa-sun' : 'fas fa-moon';
+            });
+
+            // ---------- MODAL FOR ABOUT & CONTACT ----------
+            const aboutModal = document.getElementById('aboutModal');
+            const contactModal = document.getElementById('contactModal');
+            const closeAbout = document.getElementById('closeAbout');
+            const closeContact = document.getElementById('closeContact');
+
+            function openModal(modal) {
+                modal.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+            function closeModal(modal) {
+                modal.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+
+            document.getElementById('aboutLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                closeWorkspaceFn();
+                openModal(aboutModal);
+            });
+            document.getElementById('contactLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                closeWorkspaceFn();
+                openModal(contactModal);
+            });
+            closeAbout.addEventListener('click', () => closeModal(aboutModal));
+            closeContact.addEventListener('click', () => closeModal(contactModal));
+            aboutModal.addEventListener('click', (e) => { if (e.target === aboutModal) closeModal(aboutModal); });
+            contactModal.addEventListener('click', (e) => { if (e.target === contactModal) closeModal(contactModal); });
+
+            // ---------- STICKY HEADER HIDE/SHOW ----------
+            let lastScroll = 0;
+            const header = document.getElementById('mainHeader');
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+                if (currentScroll > lastScroll && currentScroll > 60) {
+                    header.classList.add('hidden-header');
+                } else {
+                    header.classList.remove('hidden-header');
+                }
+                lastScroll = currentScroll;
+            });
+
+            // ---------- HOME LINK ----------
+            document.getElementById('homeLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                closeWorkspaceFn();
+                closeModal(aboutModal);
+                closeModal(contactModal);
+                renderGrid();
+                window.scrollTo(0,0);
+            });
+
+            // ---------- INIT ----------
+            renderGrid();
+        })();
+    </script>
+</body>
+</html>
